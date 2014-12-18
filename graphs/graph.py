@@ -1,6 +1,7 @@
 import random
 from common import Edge
 from bipartite import Bipartite
+from other/union_find import UnionFind
 
 ############################
 # DATA STRUCTURE: GraphAttributes
