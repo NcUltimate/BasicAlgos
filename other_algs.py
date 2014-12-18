@@ -35,3 +35,16 @@ class UnionFind:
 	def makeset(self, x):
 		self.parent[x] = x
 		self.rank[x] = 0
+
+	def unions(self):
+		sets = {}
+		for key in self.parent:
+			k = self.parent[key]
+			if(k not in sets[k]):
+				sets[k] = []
+			sets[k].append(key)
+		ret = []
+		for s in sets:
+			ret.append(sets[s])
+
+		return ret

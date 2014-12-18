@@ -1,7 +1,7 @@
 import random
 from common import Edge
-from bipartite import Bipartite
-from other/union_find import UnionFind
+from graph_algs import Bipartite
+from other_algs import UnionFind
 
 ############################
 # DATA STRUCTURE: GraphAttributes
@@ -9,17 +9,18 @@ from other/union_find import UnionFind
 # ~ a graph. Useful for printing.
 ############################
 class GraphAttributes:
-	def __init__(self, attr_map):
+	def __init__(self, attr_map={}):
 		# graph properties 
-		self.directed = 'directed' in attr_map ? attr_map['directed'] : False
-		self.attrs.directed = 'weighted' in attr_map ? attr_map['weighted'] : False
-		self.capacious = 'capacious' in attr_map ? attr_map['capacious'] : False
+		self.directed = attr_map['directed'] if 'directed' in attr_map  else False
+		self.weighted = attr_map['weighted'] if 'weighted' in attr_map  else False
+		self.capacious = attr_map['capacious'] if 'capacious' in attr_map else False
 
 		# require algorithmic computation. used
 		# for caching the results for successive queries.
-		self.acyclic = 'acyclic' in attr_map ? attr_map['acyclic'] : None
-		self.bipartite = 'bipartite' in attr_map ? attr_map['bipartite'] : None
-		self.regular = 'regular' in attr_map ? attr_map['regular'] : None
+		self.acyclic = attr_map['acyclic'] if 'acyclic' in attr_map else None
+		self.bipartite = attr_map['bipartite'] if 'bipartite' in attr_map else None
+		self.connected = attr_map['connected'] if 'connected' in attr_map else None
+		self.regular = attr_map['regular'] if 'regular' in attr_map else None
 
 	def modifier_list(self):
 		modifiers = []
@@ -33,11 +34,10 @@ class GraphAttributes:
 
 ############################
 # DATA STRUCTURE: Graph
-# ~ Constructor initializes an empty
-# ~ graph, to which edges and vertices
-# ~ can be added. A couple utility methods
-# ~ exist for initializing from certain file
-# ~ types.
+# ~ Constructor initializes an empty graph, to which edges and vertices
+# ~ can be added. Severl utility methods exist for obtaining such
+# ~ information as degree, neighbors, bipartiteness, and more.
+# ~ TODO: Implement initializer methods from common graph file types.
 ############################
 class Graph:
 	def __init__(self, attributes = GraphAttributes()):
@@ -45,8 +45,12 @@ class Graph:
 		self.data = {}
 		self.adj = {}
 		self.attrs = attributes
-		# TODO: implement components 
-		# via a union-find
+
+	def init_from_graph(self, g2):
+		self.E = g2.E()
+		self.data = g2.data
+		self.adj = g2.adj
+		self.attrs = g2.attrs
 
 	# graph modifier methods
 	def add_vertices(self, vtxs):
@@ -75,8 +79,8 @@ class Graph:
 		self.E.append(edge)
 
 	def connect(self, id1, id2):
-		if(self.adj[id1][id2] or \
-			 (not self.attrs.directed and self.adj[id2][id1])): return
+		if(id2 in self.adj[id1] or \
+			 (not self.attrs.directed and id1 in self.adj[id2])): return
 		
 		edge = Edge(id1, id2, self.attrs.directed)
 		self.add_edge(edge)
@@ -154,13 +158,18 @@ class Graph:
 		self.attrs.weighted = weighted
 
 	# accessor methods
-	def V(): return self.adj.keys()
-	def E(): return self.E
+	def V(self): return self.adj.keys()
 	def num_vertices(self): return len(self.V())
 	def num_edges(self): return len(self.E())
 	def is_directed(self): return self.attrs.directed
 	def is_capacious(self): return self.attrs.capacious
 	def is_weighted(self): return self.attrs.weighted
+	def is_connected(self): 
+		if(self.attrs.connected != None): return self.attrs.connected
+
+		self.attrs.connected = ConnectedComponents(self).is_connected()
+		return self.attrs.connected
+		
 	def is_bipartite(self): 
 		if(self.attrs.bipartite != None): return self.attrs.bipartite
 

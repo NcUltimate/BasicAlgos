@@ -1,10 +1,8 @@
 
 ############################
 # DATA STRUCTURE: Edge
-# ~ Dense edge class with numerous attributes
-# ~ capable of fitting almost any algorithm.
-# ~ If smaller edges are desired, such as an
-# ~ undirected unweighted edge, a set() can simply
+# ~ General edge class with numerous attributes capable of fitting almost any algorithm.
+# ~ If smaller edges are desired, such as an undirected unweighted edge, a set() can simply
 # ~ be used.
 ############################
 class Edge:
@@ -50,3 +48,12 @@ class Edge:
 
 	def __eq__(self, other):
 		return self.equals(other)
+
+	def __str__(self):
+		ret = str(self.v1)+"-"+(self.wt if self.weighted() else "")
+		ret += ("/" + str(self.cap)) if self.capacious() else ""
+		ret += "-"+str(self.v2)
+		return ret
+
+	def __repr__(self):
+		return self.__str__();
