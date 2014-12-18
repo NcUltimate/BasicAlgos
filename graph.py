@@ -27,6 +27,7 @@ class GraphAttributes:
 		modifiers.append('acyclic'  if self.acyclic  else 'cyclic')
 		if(self.bipartite): modifiers.append('bipartite')
 		if(self.regular):   modifiers.append('regular')
+		return modifiers
 
 
 ############################
