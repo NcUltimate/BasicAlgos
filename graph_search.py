@@ -43,6 +43,9 @@ class BFS:
 # IMPLEMENTATION
 # ~ A DFS recursively visits the children of each node
 # ~ before checking the node itself for the search query.
+# ~ In large unbounded graphs, it would be wise to limit
+# ~ the DFS with a maximum depth to make it a Depth
+# ~ Limited Search. This functionality is available here.
 ############################
 class DFS:
 	def __init__(self, graph, max_depth = -1):
