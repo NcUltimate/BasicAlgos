@@ -37,8 +37,8 @@ class Bipartite:
 		# edge are not the same marking.
 		for edge in g.E():
 			edge = list(edge)
-			m0 = marked[edge[0]]
-			m1 = marked[edge[1]]
+			m0 = marked[edge.v1]
+			m1 = marked[edge.v2]
 			if( m0 == m1): return
 
 		# it is bipartite if the function reaches this point.

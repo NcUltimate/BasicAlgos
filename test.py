@@ -17,7 +17,9 @@ def main():
 	graph1.connect(5,2)
 	graph1.connect(4,2)
 
+	bp = ga.Bipartite(graph1)
 	cd = ga.CycleDetection(graph1)
+	print(bp.is_bipartite())
 	print(cd.cycles)
 
 main()
