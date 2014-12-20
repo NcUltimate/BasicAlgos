@@ -25,9 +25,9 @@ class UnionFind:
 		rx, ry = self.rank[xpar], self.rank[ypar]
 		
 		if(rx > ry):
-			self.parent[xpar] = ypar
-		elif(rx < ry):
 			self.parent[ypar] = xpar
+		elif(rx < ry):
+			self.parent[xpar] = ypar
 		else:
 			self.parent[ypar] = xpar
 			self.rank[xpar] += 1
@@ -40,7 +40,7 @@ class UnionFind:
 		sets = {}
 		for key in self.parent:
 			k = self.parent[key]
-			if(k not in sets[k]):
+			if(k not in sets):
 				sets[k] = []
 			sets[k].append(key)
 		ret = []

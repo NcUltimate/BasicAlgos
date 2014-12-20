@@ -1,7 +1,5 @@
 import random
 from common import Edge
-from graph_algs import Bipartite
-from other_algs import UnionFind
 
 ############################
 # DATA STRUCTURE: GraphAttributes
@@ -15,20 +13,16 @@ class GraphAttributes:
 		self.weighted = attr_map['weighted'] if 'weighted' in attr_map  else False
 		self.capacious = attr_map['capacious'] if 'capacious' in attr_map else False
 
-		# require algorithmic computation. used
-		# for caching the results for successive queries.
-		self.acyclic = attr_map['acyclic'] if 'acyclic' in attr_map else None
-		self.bipartite = attr_map['bipartite'] if 'bipartite' in attr_map else None
-		self.connected = attr_map['connected'] if 'connected' in attr_map else None
-		self.regular = attr_map['regular'] if 'regular' in attr_map else None
+	def init_from_ga(self, ga):
+		self.directed = ga.directed
+		self.weighted = ga.weighted
+		self.capacious = ga.capacious
 
 	def modifier_list(self):
 		modifiers = []
 		modifiers.append('directed' if self.directed else 'undirected')
 		modifiers.append('weighted' if self.weighted else 'unweighted')
 		modifiers.append('acyclic'  if self.acyclic  else 'cyclic')
-		if(self.bipartite): modifiers.append('bipartite')
-		if(self.regular):   modifiers.append('regular')
 		return modifiers
 
 
@@ -47,17 +41,22 @@ class Graph:
 		self.attrs = attributes
 
 	def init_from_graph(self, g2):
-		self.E = g2.E()
-		self.data = g2.data
-		self.adj = g2.adj
-		self.attrs = g2.attrs
+		self.data = dict(g2.data)
+		self.attrs.init_from_ga(g2.attrs)
+		for e in g2.E:
+			self.add_edge(e)
+
+	def dup(self):
+		new_graph = Graph()
+		new_graph.init_from_graph(self)
+		return new_graph
 
 	# graph modifier methods
 	def add_vertices(self, vtxs):
 		for v in vtxs: self.add_vertex(v)
 
 	def add_vertex(self, v, data = {}):
-		if(v in self.data): return
+		if(v in self.V()): return
 
 		self.data[v] = data
 		if('id' not in self.data[v]): self.data[v]['id'] = v
@@ -69,6 +68,8 @@ class Graph:
 		for edge in edges: self.add_edge(edge)
 
 	def add_edge(self, edge):
+		if(edge in self.E): return
+
 		self.add_vertices(edge.endpoints())
 		if(self.attrs.directed):
 			self.adj[edge.start()][edge.end()] = edge
@@ -79,6 +80,11 @@ class Graph:
 		self.E.append(edge)
 
 	def connect(self, id1, id2):
+		if(id1 not in self.adj): 
+			self.add_vertex(id1)
+		if(id2 not in self.adj):
+			self.add_vertex(id2)
+
 		if(id2 in self.adj[id1] or \
 			 (not self.attrs.directed and id1 in self.adj[id2])): return
 		
@@ -196,17 +202,3 @@ class Graph:
 	def is_directed(self): return self.attrs.directed
 	def is_capacious(self): return self.attrs.capacious
 	def is_weighted(self): return self.attrs.weighted
-	def is_connected(self): 
-		if(self.attrs.connected != None): return self.attrs.connected
-
-		self.attrs.connected = ConnectedComponents(self).is_connected()
-		return self.attrs.connected
-		
-	def is_bipartite(self): 
-		if(self.attrs.bipartite != None): return self.attrs.bipartite
-
-		self.attrs.bipartite = Bipartite(self).is_bipartite()
-		return self.attrs.bipartite
-
-	def is_acyclic(self): return False
-	def is_regular(self): return False

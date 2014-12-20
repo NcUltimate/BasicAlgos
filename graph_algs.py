@@ -1,3 +1,5 @@
+from other_algs import UnionFind
+
 ############################
 # ALGORITHM: Bipartite
 # ~ Takes a Graph as input. If the graph is bipartite, the
@@ -35,7 +37,7 @@ class Bipartite:
 
 		# check that the endpoints of each
 		# edge are not the same marking.
-		for edge in g.E():
+		for edge in g.E:
 			edge = list(edge)
 			m0 = marked[edge.v1]
 			m1 = marked[edge.v2]
@@ -54,7 +56,6 @@ class Bipartite:
 
 	def is_bipartite(self):
 		return len(self.A)!=0 and len(self.B)!=0
-
 
 ############################
 # ALGORITHM: Connected Components of a Graph
@@ -75,7 +76,7 @@ class ConnectedComponents:
 		self.algorithm(graph)
 
 	def algorithm(self, graph):
-		for e in graph.E():
+		for e in graph.E:
 			self.union_find.union(e.v1, e.v2)
 		self.comps = self.union_find.unions()
 
@@ -84,7 +85,6 @@ class ConnectedComponents:
 
 	def components(self):
 		return self.comps
-
 
 ############################
 # ALGORITHM: Breadth-First Search (BFS)
@@ -167,9 +167,9 @@ class DFS:
 ############################
 # ALGORITHM: Spanning Tree
 # ~ Takes a Graph as input, and returns a spanning tree
-# ~ of the graph. A spanning tree is a minimal set of
+# ~ of the graph. A spanning tree is a minimal acyclic set of
 # ~ connected edges such that every vertex in the graph
-# ~ is an endpoint of at least one edge.
+# ~ is an endpoint of at least one edge in the set.
 # 
 # IMPLEMENTATION:
 # ~ Perform a Breadth-First Traversal. Along the way, if a
@@ -178,7 +178,7 @@ class DFS:
 class SpanningTree:
 
 	def __init__(self, graph):
-		self.tree = graph
+		self.tree = graph.dup()
 		if(not graph.is_directed()):
 			self.algorithm()
 
@@ -202,7 +202,7 @@ class SpanningTree:
 		return self.tree
 
 ############################
-# ALGORITHM: Cycle Detection
+# ALGORITHM: Cycle Count
 # ~ Takes a Graph as input, and returns the number of simple
 # ~ cycles in the graph.
 #
@@ -211,7 +211,7 @@ class SpanningTree:
 # ~ in the graph that aren't in the spanning tree (Non-tree
 # ~ edges) is the number of cycles.
 ############################
-class CycleDetection:
+class CycleCount:
 
 	def __init__(self, graph):
 		self.cycles = 0
@@ -225,5 +225,36 @@ class CycleDetection:
 	def is_acyclic(self):
 		return self.cycles == 0
 
+############################
+# ALGORITHM: Kruskal's Minimum Spanning Tree
+# ~ Takes a Graph as input, and returns an MST
+# ~ of the graph. An MST is a minimal acyclic set of
+# ~ connected edges with minimum weight such that
+# ~ every vertex in the graph is an endpoint of at 
+# ~ least one edge in the set.
+# 
+# IMPLEMENTATION:
+# ~ Create a new graph with no edges and the same vertices
+# ~ as the old graph. Sort the edges of the old graph by weight.
+# ~ Add edges into the new graph in increasing order of weight
+# ~ as long as they don't create cycles. Cycle detection in this
+# ~ case is done via a Union-Find to determine whether endpoints
+# ~ have the same component membership.
+############################
+class MinSpanningTree:
+
+	def __init__(self, graph):
+		self.tree = graph.dup()
+		if(not graph.is_directed()):
+			self.algorithm()
+
+	def edge_wt_sort(self, edge):
+		return edge.wt
+
+	def algorithm(self):
+		pass
+
+	def mst(self):
+		return self.tree
 
 
