@@ -86,13 +86,13 @@ class Graph:
 		self.add_edge(edge)
 
 	def disconnect(self, v1, v2):
-		if(v2 in self.adj[v1]): 
-			self.E.remove(self.adj[v1][v2])
-			del self.adj[v1][v2]
-		if(self.attrs.directed): return
+		if(v1 not in self.adj): return
+		if(v2 not in self.adj[v1]): return
 
-		if(v1 in self.adj[v2]): 
-			self.E.remove(self.adj[v2][v1])
+		self.E.remove(self.adj[v1][v2])
+		del self.adj[v1][v2]
+
+		if(not self.attrs.directed):
 			del self.adj[v2][v1]
 
 	def remove_edge(self, edge):
@@ -100,6 +100,7 @@ class Graph:
 		self.disconnect(edge.v1, edge.v2)
 
 	def remove_vertex(self, vtx):
+		if(vtx not in self.adj): return
 		for n in self.adj:
 			if(vtx in self.adj[n]): 
 				self.E.remove(self.adj[n][vtx])
@@ -146,6 +147,37 @@ class Graph:
 
 	def random_edge(self): 
 		return random.choice(self.E())
+
+	def cut(self, vertices):
+		for v in vertices:
+			self.remove_vertex(v)
+
+	def subgraph(self, vertices):
+		g2 = Graph()
+		for v in vertices:
+			if(v not in self.adj): continue
+			for v2 in self.adj[v]:
+				g2.add_edge(self.adj[v][v2])
+		return g2
+
+	def equals(self, g2):
+		if(isinstance(g2, self.__class__)):
+			numV1, numV2 = len(self.V()), len(g2.V())
+			numE1, numE2 = len(self.E), len(g2.E)
+			if(numV1 != numV2 or numE1 != numE2): return False
+
+			for v1 in self.adj:
+				for v2 in self.adj[v1]:
+					if(v1 not in g2.adj): return False
+					if(v2 not in g2.adj[v1]): return False
+					if(not self.adj[v1][v2].equals(g2.adj[v1][v2])): return False
+
+			return True
+		else:
+			return False
+
+	def __eq__(self, other):
+		return self.equals(other)
 
 	# attribute modifiers
 	def set_directed(self, directed): 

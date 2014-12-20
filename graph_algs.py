@@ -5,7 +5,7 @@
 # ~ bipartitions. If not, the bipartitions will remain
 # ~ empty, and is_bipartite will return False.
 #
-# IMPLEMENTATION
+# IMPLEMENTATION:
 # ~ Performs a Breadth-First Traversal, 2-coloring nodes
 # ~ along the way. If any 2 adjacent nodes ever share the 
 # ~ same color, the graph cannot be bipartite.
@@ -62,7 +62,7 @@ class Bipartite:
 # ~ A graph is connected if there is a path from any node to
 # ~ any other node in the graph.
 #
-# IMPLEMENTATION
+# IMPLEMENTATION:
 # ~ Use a union-find to union all nodes in the graph based
 # ~ on the edges in the graph. Then look at the number of
 # ~ unions to determine the connected components of the graph.
@@ -94,7 +94,7 @@ class ConnectedComponents:
 # ~ result becomes 'None' to indicate the query item
 # ~ was not found.
 #
-# IMPLEMENTATION
+# IMPLEMENTATION:
 # ~ A BFS iteratively adds vertices to a queue by
 # ~ adding all neighbors first, then popping the queue
 # ~ until it is empty and all vertices have been visited.
@@ -128,7 +128,7 @@ class BFS:
 # ~ result becomes 'None' to indicate the query item
 # ~ was not found.
 #
-# IMPLEMENTATION
+# IMPLEMENTATION:
 # ~ A DFS recursively visits the children of each node
 # ~ before checking the node itself for the search query.
 # ~ In large unbounded graphs, it would be wise to limit
@@ -164,19 +164,66 @@ class DFS:
 		else:
 			return None
 
+############################
+# ALGORITHM: Spanning Tree
+# ~ Takes a Graph as input, and returns a spanning tree
+# ~ of the graph. A spanning tree is a minimal set of
+# ~ connected edges such that every vertex in the graph
+# ~ is an endpoint of at least one edge.
+# 
+# IMPLEMENTATION:
+# ~ Perform a Breadth-First Traversal. Along the way, if a
+# ~ Non-tree edge is encountered, remove it from the graph.
+############################
+class SpanningTree:
+
+	def __init__(self, graph):
+		self.tree = graph
+		if(not graph.is_directed()):
+			self.algorithm()
+
+	def algorithm(self):
+		visited = set()
+		for vtx in self.tree.V():
+			if(vtx in visited): continue
+			visited.add(vtx)
+			queue = [vtx]
+			while(queue):
+				v = queue.pop(0)
+				visited.add(v)
+				for neigh in self.tree.neighbors(v):
+					if(neigh in visited): continue
+					if(neigh in queue):
+						self.tree.disconnect(v, neigh)
+						continue
+					queue.append(neigh)
+
+	def spanning_tree(self):
+		return self.tree
 
 ############################
 # ALGORITHM: Cycle Detection
-# ~ Takes a Graph as input, and returns all simple cycles in 
-# ~ the graph as paths.
+# ~ Takes a Graph as input, and returns the number of simple
+# ~ cycles in the graph.
 #
-# IMPLEMENTATION
-# ~ A BFS iteratively adds vertices to a queue by
-# ~ adding all neighbors first, then popping the queue
-# ~ until it is empty and all vertices have been visited.
+# IMPLEMENTATION:
+# ~ Find a Spanning Tree of the graph. The number of edges
+# ~ in the graph that aren't in the spanning tree (Non-tree
+# ~ edges) is the number of cycles.
 ############################
 class CycleDetection:
-	pass
+
+	def __init__(self, graph):
+		self.cycles = 0
+		self.algorithm(graph)
+
+	def algorithm(self, g):
+		g_edges = len(g.E)
+		st = SpanningTree(g)
+		self.cycles = g_edges- len(st.tree.E)
+
+	def is_acyclic(self):
+		return self.cycles == 0
 
 
 
