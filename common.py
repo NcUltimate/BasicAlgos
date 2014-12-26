@@ -1,9 +1,9 @@
 
 ############################
 # DATA STRUCTURE: Edge
-# ~ General edge class with numerous attributes capable of fitting almost any algorithm.
-# ~ If smaller edges are desired, such as an undirected unweighted edge, a set() can simply
-# ~ be used.
+# ~ General edge class with numerous attributes capable of fitting almost any graph 
+# ~ algorithm. If smaller edges are desired, such as an undirected unweighted edge, 
+# ~ a set() can simply be used.
 ############################
 class Edge:
 
@@ -60,3 +60,45 @@ class Edge:
 
 	def __repr__(self):
 		return self.__str__()
+
+############################
+# DATA STRUCTURE: Node
+# ~ General node class with numerous attributes capable of fitting almost any tree
+# ~ algorithm. Holds two children, a value, and a single parent.
+############################
+class Node:
+
+	def __init__(self, value=None):
+		self.parent = None
+		self.lchild = None
+		self.rchild = None
+		self.value = value
+
+	def set_parent(self, new_parent):
+		self.parent = new_parent
+
+	def set_lchild(self, node):
+		self.lchild = node
+
+	def set_rchild(self, node):
+		self.rchild = node
+
+	def children(self):
+		return [self.lchild, self.rchild]
+
+	def is_root(self):
+		return self.parent == None
+
+	def is_leaf(self):
+		return not(self.lchild or self.rchild)
+
+	def is_internal(self):
+		return self.parent and len(self.children()) > 0
+
+	def __str__(self):
+		return "( "+str(self.value)+" )"
+
+	def __repr__(self):
+		return self.__str__()
+
+
