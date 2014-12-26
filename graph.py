@@ -2,47 +2,31 @@ import random
 from common import Edge
 
 ############################
-# DATA STRUCTURE: GraphAttributes
-# ~ Holds several values that describe
-# ~ a graph. Useful for printing.
-############################
-class GraphAttributes:
-	def __init__(self, attr_map={}):
-		# graph properties 
-		self.directed = attr_map['directed'] if 'directed' in attr_map  else False
-		self.weighted = attr_map['weighted'] if 'weighted' in attr_map  else False
-		self.capacious = attr_map['capacious'] if 'capacious' in attr_map else False
-
-	def init_from_ga(self, ga):
-		self.directed = ga.directed
-		self.weighted = ga.weighted
-		self.capacious = ga.capacious
-
-	def modifier_list(self):
-		modifiers = []
-		modifiers.append('directed' if self.directed else 'undirected')
-		modifiers.append('weighted' if self.weighted else 'unweighted')
-		modifiers.append('acyclic'  if self.acyclic  else 'cyclic')
-		return modifiers
-
-
-############################
 # DATA STRUCTURE: Graph
 # ~ Constructor initializes an empty graph, to which edges and vertices
 # ~ can be added. Severl utility methods exist for obtaining such
 # ~ information as degree, neighbors, bipartiteness, and more.
 # ~ TODO: Implement initializer methods from common graph file types.
+#
+# RECOGNIZED ATTRIBUTES:
+# ~ 'weighted' : graph has weighted edges
+# ~ 'directed' : graph has directed edges
+# ~ 'capacious' : graph edges have capacity
 ############################
 class Graph:
-	def __init__(self, attributes = GraphAttributes()):
+	def __init__(self, attrs={}):
 		self.E = []
 		self.data = {}
 		self.adj = {}
-		self.attrs = attributes
+
+		defaults = {'weighted':False,
+					'directed':False,
+					'capacious':False }
+		self.attrs = dict(defaults.items() + attrs.items())
 
 	def init_from_graph(self, g2):
 		self.data = dict(g2.data)
-		self.attrs.init_from_ga(g2.attrs)
+		self.attrs = dict(self.attrs.items() + g2.attrs.items())
 		for e in g2.E:
 			self.add_edge(e)
 
@@ -65,13 +49,20 @@ class Graph:
 		self.adj[v] = {}
 
 	def add_edges(self, edges):
-		for edge in edges: self.add_edge(edge)
+		for edge in edges: 
+			self.add_edge(edge)
 
 	def add_edge(self, edge):
-		if(edge in self.E): return
-
+		# add endpoints if thet aren't already
+		# in the graph
 		self.add_vertices(edge.endpoints())
-		if(self.attrs.directed):
+
+		# duplicate detection
+		if(edge.v2 in self.adj[edge.v1] or \
+			 (not self.attrs['directed'] \
+			 	and edge.v1 in self.adj[edge.v2])): return
+
+		if(self.attrs['directed']):
 			self.adj[edge.start()][edge.end()] = edge
 		else:
 			self.adj[edge.v1][edge.v2] = edge
@@ -79,16 +70,8 @@ class Graph:
 
 		self.E.append(edge)
 
-	def connect(self, id1, id2):
-		if(id1 not in self.adj): 
-			self.add_vertex(id1)
-		if(id2 not in self.adj):
-			self.add_vertex(id2)
-
-		if(id2 in self.adj[id1] or \
-			 (not self.attrs.directed and id1 in self.adj[id2])): return
-		
-		edge = Edge(id1, id2, self.attrs.directed)
+	def connect(self, id1, id2, wt=None, cap=None):
+		edge = Edge(id1, id2, self.attrs['directed'], wt, cap)
 		self.add_edge(edge)
 
 	def disconnect(self, v1, v2):
@@ -98,7 +81,7 @@ class Graph:
 		self.E.remove(self.adj[v1][v2])
 		del self.adj[v1][v2]
 
-		if(not self.attrs.directed):
+		if(not self.attrs['directed']):
 			del self.adj[v2][v1]
 
 	def remove_edge(self, edge):
@@ -123,36 +106,23 @@ class Graph:
 		return (v2 in self.adj[v1]) \
 				or(v1 in self.adj[v2])
 
-	def neighbors(self, v): 
-		return self.adj[v].keys()
-
+	def neighbors(self, v): return self.adj[v].keys()
 	def edges(self, v):
 		return [self.adj[v][v2] for v2 in self.adj[v]]
 
-	def edges_from(self, v): 
-		return self.edges(v)
-
+	def edges_from(self, v): return self.edges(v)
 	def edges_into(self, v):
-		if(not self.attrs.directed): 
+		if(not self.attrs['directed']): 
 			return self.edges(v)
 
 		edges = [self.adj[vtx][v] for vtx in self.V() if v in self.adj[vtx]]
 		return edges
 
-	def degree(self, v): 
-		return len(self.neighbors(v))
-
-	def out_degree(self, v): 
-		return self.degree(v)
-
-	def in_degree(self, v): 
-		return len(self.edges_into(v))
-
-	def random_vertex(self): 
-		return random.choice(self.V())
-
-	def random_edge(self): 
-		return random.choice(self.E())
+	def degree(self, v): return len(self.neighbors(v))
+	def out_degree(self, v): return self.degree(v)
+	def in_degree(self, v): return len(self.edges_into(v))
+	def random_vertex(self): return random.choice(self.V())
+	def random_edge(self): return random.choice(self.E())
 
 	def cut(self, vertices):
 		for v in vertices:
@@ -186,19 +156,14 @@ class Graph:
 		return self.equals(other)
 
 	# attribute modifiers
-	def set_directed(self, directed): 
-		self.attrs.directed = directed
-
-	def set_capacious(self, capacious): 
-		self.attrs.capacious = capacious
-		
-	def set_weighted(self, weighted): 
-		self.attrs.weighted = weighted
+	def set_directed(self, directed): self.attrs['directed'] = directed
+	def set_capacious(self, capacious): self.attrs['capacious'] = capacious
+	def set_weighted(self, weighted): self.attrs['weighted'] = weighted
 
 	# accessor methods
 	def V(self): return self.adj.keys()
 	def num_vertices(self): return len(self.V())
 	def num_edges(self): return len(self.E())
-	def is_directed(self): return self.attrs.directed
-	def is_capacious(self): return self.attrs.capacious
-	def is_weighted(self): return self.attrs.weighted
+	def is_directed(self): return self.attrs['directed']
+	def is_capacious(self): return self.attrs['capacious']
+	def is_weighted(self): return self.attrs['weighted']

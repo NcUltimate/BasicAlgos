@@ -2,7 +2,7 @@ import common as com
 import graph as g
 import graph_algs as ga
 
-def main():
+def basic_test():
 	graph1 = g.Graph()
 	graph1.connect(1,2)
 	graph1.connect(2,3)
@@ -17,11 +17,31 @@ def main():
 	
 	cc = ga.ConnectedComponents(graph1)
 	bp = ga.Bipartite(graph1)
-	cd = ga.CycleDetection(graph1)
-	print(graph1.E)
-	print(graph1.attrs.modifier_list())
-	print(cc.components())
-	print(bp.is_bipartite())
-	print(cd.cycles)
+	cd = ga.CycleCount(graph1)
+
+	print("Connected Components: "+str(cc.components()))
+	print("It is "+("not" if not bp.is_bipartite() else "") + " bipartite.")
+	print("It "+("is acyclic" if cd.cycles == 0 else "has "+str(cd.cycles)+" cycles."))
+
+def weighted_test():
+	g1 = g.Graph({'weighted' : True})
+	g1.connect(1,2,2)
+	g1.connect(2,3,4)
+	g1.connect(3,4,8)
+	g1.connect(4,5,6)
+	g1.connect(5,6,2)
+	g1.connect(5,2,7)
+	g1.connect(6,2,3)
+	g1.connect(6,7,5)
+	g1.connect(7,8,4)
+	g1.connect(8,1,5)
+	
+	print("Minimum Spanning Tree:")
+	mst = ga.MinSpanningTree(g1)
+	print(mst.mst().E)
+
+def main():
+	basic_test()
+	weighted_test()
 
 main()

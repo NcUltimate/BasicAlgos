@@ -7,12 +7,12 @@
 ############################
 class Edge:
 
-	def __init__(self, v1, v2, directed=False):
+	def __init__(self, v1, v2, directed=False, weight=None, capacity=None):
 		self.v1 = v1
 		self.v2 = v2
 		self.dir = directed
-		self.wt = None
-		self.cap = None
+		self.wt = weight
+		self.cap = capacity
 
 	# modifier methods
 	def set_weight(self, wt): self.wt = wt
@@ -50,10 +50,13 @@ class Edge:
 		return self.equals(other)
 
 	def __str__(self):
-		ret = str(self.v1)+"-"+(self.wt if self.weighted() else "")
+		ret = str(self.v1)+"-"
+		ret += "(" if self.weighted() or self.capacious() else ""
+		ret += str(self.wt) if self.weighted() else ""
 		ret += ("/" + str(self.cap)) if self.capacious() else ""
+		ret += (")" if self.weighted or self.capacious() else "")
 		ret += "-"+str(self.v2)
 		return ret
 
 	def __repr__(self):
-		return self.__str__();
+		return self.__str__()
