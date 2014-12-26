@@ -37,8 +37,9 @@ def weighted_test():
 	g1.connect(8,1,5)
 	
 	print("Minimum Spanning Tree:")
-	mst = ga.MinSpanningTree(g1)
+	mst = ga.KruskalMST(g1)
 	print(mst.mst().E)
+	print(mst.weight())
 
 def main():
 	basic_test()

@@ -1,4 +1,5 @@
 from other_algs import UnionFind
+from graph import Graph
 
 ############################
 # ALGORITHM: Bipartite
@@ -241,20 +242,37 @@ class CycleCount:
 # ~ case is done via a Union-Find to determine whether endpoints
 # ~ have the same component membership.
 ############################
-class MinSpanningTree:
+class KruskalMST:
 
 	def __init__(self, graph):
-		self.tree = graph.dup()
+		self.tree = Graph({"weighted" : True})
+		self.min_weight = 0
 		if(not graph.is_directed()):
-			self.algorithm()
+			self.algorithm(graph)
 
 	def edge_wt_sort(self, edge):
 		return edge.wt
 
-	def algorithm(self):
-		pass
+	def algorithm(self, graph):
+		edges = sorted(graph.E, key=self.edge_wt_sort)
+
+		uf = UnionFind()
+		for vtx in graph.V():
+			uf.makeset(vtx)
+
+		for edge in edges:
+			par_v1 = uf.find(edge.v1)
+			par_v2 = uf.find(edge.v2)
+			if(par_v1 == par_v2): continue
+
+			self.tree.add_edge(edge)
+			self.min_weight += edge.wt
+			uf.union(edge.v1, edge.v2)
 
 	def mst(self):
 		return self.tree
+
+	def weight(self):
+		return self.min_weight
 
 
