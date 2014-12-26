@@ -25,7 +25,7 @@ def graph_test_1():
 	print("It is "+("not" if not bp.is_bipartite() else "") + " bipartite.")
 	print("It "+("is acyclic" if cd.cycles == 0 else "has "+str(cd.cycles)+" cycles."))
 
-# weighted graph test
+# MST test
 def graph_test_2():
 	g1 = g.Graph({'weighted' : True})
 	g1.connect(1,2,2)
@@ -39,8 +39,13 @@ def graph_test_2():
 	g1.connect(7,8,4)
 	g1.connect(8,1,5)
 	
-	print("Minimum Spanning Tree:")
+	print("Kruskal's MST Algorithm:")
 	mst = ga.KruskalMST(g1)
+	print(mst.mst().E)
+	print(mst.weight())
+
+	print("Prim's MST Algorithm:")
+	mst = ga.PrimMST(g1)
 	print(mst.mst().E)
 	print(mst.weight())
 
@@ -83,9 +88,9 @@ def heap_test():
 		print(maxheap.pop())
 
 def main():
+	heap_test()
 	graph_test_1()
 	graph_test_2()
-	heap_test()
 
 
 main()

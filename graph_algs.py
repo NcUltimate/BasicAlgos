@@ -1,4 +1,5 @@
 from other_algs import UnionFind
+from heap import MinHeap
 from graph import Graph
 
 ############################
@@ -268,6 +269,55 @@ class KruskalMST:
 			self.tree.add_edge(edge)
 			self.min_weight += edge.wt
 			uf.union(edge.v1, edge.v2)
+
+	def mst(self):
+		return self.tree
+
+	def weight(self):
+		return self.min_weight
+
+############################
+# ALGORITHM: Prim's Minimum Spanning Tree
+# ~ Takes a Graph as input, and returns an MST
+# ~ of the graph. An MST is a minimal acyclic set of
+# ~ connected edges with minimum weight such that
+# ~ every vertex in the graph is an endpoint of at 
+# ~ least one edge in the set.
+# 
+# IMPLEMENTATION:
+# ~ Create a new graph with no edges and the same vertices
+# ~ as the old graph. Sort the edges of the old graph by weight.
+# ~ Add the cheapest edge to the new graph, then insert all of its
+# ~ adjoining edges onto a MinHeap. Continue this until inserting
+# ~ another edge into the new graph would create a cycle.
+############################
+class PrimMST:
+
+	def __init__(self, graph):
+		self.tree = Graph({"weighted" : True})
+		self.min_weight = 0
+		if(not graph.is_directed()):
+			self.algorithm(graph)
+
+	def edge_wt_sort(self, edge):
+		return edge.wt
+
+	def algorithm(self, graph):
+		edges = sorted(graph.E, key=self.edge_wt_sort)
+
+		hp = MinHeap()
+		hp.insert(edges[0])
+
+		while(not hp.empty()):
+			edge = hp.pop()
+			graph.remove_edge(edge)
+			if(edge.v1 in self.tree.V() \
+				and edge.v2 in self.tree.V()): continue
+			
+			self.tree.add_edge(edge)
+			self.min_weight += edge.wt
+			neighborhood = graph.edges(edge.v1) + graph.edges(edge.v2)
+			hp.insert_all(neighborhood)
 
 	def mst(self):
 		return self.tree

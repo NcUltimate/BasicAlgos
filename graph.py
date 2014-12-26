@@ -85,7 +85,7 @@ class Graph:
 			del self.adj[v2][v1]
 
 	def remove_edge(self, edge):
-		if(edge not in self.E()): return
+		if(edge not in self.E): return
 		self.disconnect(edge.v1, edge.v2)
 
 	def remove_vertex(self, vtx):

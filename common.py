@@ -46,6 +46,9 @@ class Edge:
 		else:
 			return False
 
+	def __cmp__(self, other):
+		return self.wt.__cmp__(other.wt)
+
 	def __eq__(self, other):
 		return self.equals(other)
 

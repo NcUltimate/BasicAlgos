@@ -7,6 +7,11 @@ from common import Node
 # ~ or max at the time of initialization. THis data structure
 # ~ Is commonly used for MinHeaps, MaxHeaps, and Priority Queues.
 #
+#~ NOTE: This data strucute uses the __cmp__ method to allow the
+# ~ comparison of any object. To 'heapify' any object or type,
+# ~ simply override this method to define your own comparison with
+# ~ another object of the same type.
+#
 # RUNNING TIME:
 # ~ Insert: O(lg(n))
 # ~ Pop: O(lg(n))
@@ -17,7 +22,7 @@ class Heap:
 
 	def __init__(self, minheap=True):
 		self.root = None
-		self.minheap = minheap
+		self.heap_type = -1 if minheap else 1
 
 		# dictionary to keep track of subtree sizes.
 		# this keeps the tree balanced when inserting.
@@ -50,31 +55,18 @@ class Heap:
 				self.__swap__(node, node.rchild)
 				return self.__sink__(node.rchild, False)
 			else:
-				if(self.minheap):
-					if(node.lchild.value < node.rchild.value):
-						self.__swap__(node, node.lchild)
-						return self.__sink__(node.lchild)
-					else:
-						self.__swap__(node, node.rchild)
-						return self.__sink__(node.rchild, False)
+				if(node.lchild.value.__cmp__(node.rchild.value) == self.heap_type):
+					self.__swap__(node, node.lchild)
+					return self.__sink__(node.lchild)
 				else:
-					if(node.lchild.value > node.rchild.value):
-						self.__swap__(node, node.lchild)
-						return self.__sink__(node.lchild)
-					else:
-						self.__swap__(node, node.rchild)
-						return self.__sink__(node.rchild, False)
+					self.__swap__(node, node.rchild)
+					return self.__sink__(node.rchild, False)
 
 	def __bubble__(self, node):
 		if(node.parent == None): return
-		if(self.minheap):
-			if(node.value < node.parent.value):
-				self.__swap__(node, node.parent)
-				self.__bubble__(node.parent)
-		else:
-			if(node.value > node.parent.value):
-				self.__swap__(node, node.parent)
-				self.__bubble__(node.parent)
+		if(node.value.__cmp__(node.parent.value) == self.heap_type):
+			self.__swap__(node, node.parent)
+			self.__bubble__(node.parent)
 
 	def __findleaf__(self, value, node):
 		self.cts[node] += 1
@@ -93,6 +85,9 @@ class Heap:
 			newnode.parent = node
 			self.__bubble__(newnode)
 
+	def insert_all(self, values):
+		for value in values:
+			self.insert(value)
 	def insert(self, value):
 		if(self.root == None):
 			self.root = Node(value)
