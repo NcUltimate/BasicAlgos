@@ -230,8 +230,8 @@ class CycleCount:
 ############################
 # ALGORITHM: Kruskal's Minimum Spanning Tree
 # ~ Takes a Graph as input, and returns an MST
-# ~ of the graph. An MST is a minimal acyclic set of
-# ~ connected edges with minimum weight such that
+# ~ of the graph. An MST is a maximal acyclic set of
+# ~ connected edges with minimum total weight such that
 # ~ every vertex in the graph is an endpoint of at 
 # ~ least one edge in the set.
 # 
@@ -279,8 +279,8 @@ class KruskalMST:
 ############################
 # ALGORITHM: Prim's Minimum Spanning Tree
 # ~ Takes a Graph as input, and returns an MST
-# ~ of the graph. An MST is a minimal acyclic set of
-# ~ connected edges with minimum weight such that
+# ~ of the graph. An MST is a maximal acyclic set of
+# ~ connected edges with minimum total weight such that
 # ~ every vertex in the graph is an endpoint of at 
 # ~ least one edge in the set.
 # 
