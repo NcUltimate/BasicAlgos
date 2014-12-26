@@ -83,6 +83,12 @@ class Node:
 	def set_rchild(self, node):
 		self.rchild = node
 
+	def left(self, node):
+		self.set_lchild(node)
+
+	def right(self, node):
+		self.set_rchild(node)
+
 	def children(self):
 		return [self.lchild, self.rchild]
 
@@ -90,10 +96,13 @@ class Node:
 		return self.parent == None
 
 	def is_leaf(self):
-		return not(self.lchild or self.rchild)
+		return self.lchild == None and self.rchild == None
 
 	def is_internal(self):
 		return self.parent and len(self.children()) > 0
+
+	def size(self):
+		return self.count
 
 	def __str__(self):
 		return "( "+str(self.value)+" )"

@@ -1,8 +1,10 @@
 import common as com
 import graph as g
 import graph_algs as ga
+import heap as h
 
-def basic_test():
+# basic graph functionality test
+def graph_test_1():
 	graph1 = g.Graph()
 	graph1.connect(1,2)
 	graph1.connect(2,3)
@@ -23,7 +25,8 @@ def basic_test():
 	print("It is "+("not" if not bp.is_bipartite() else "") + " bipartite.")
 	print("It "+("is acyclic" if cd.cycles == 0 else "has "+str(cd.cycles)+" cycles."))
 
-def weighted_test():
+# weighted graph test
+def graph_test_2():
 	g1 = g.Graph({'weighted' : True})
 	g1.connect(1,2,2)
 	g1.connect(2,3,4)
@@ -41,8 +44,48 @@ def weighted_test():
 	print(mst.mst().E)
 	print(mst.weight())
 
+def heap_test():
+	heap = h.Heap()
+	heap.insert(100)
+	heap.insert(25)
+	heap.insert(17)
+	heap.insert(2)
+	heap.insert(19)
+	heap.insert(3)
+	heap.insert(36)
+	heap.insert(7)
+	heap.insert(1)
+	minheap = h.MinHeap()
+	maxheap = h.MaxHeap()
+	minheap.merge(heap)
+	maxheap.merge(heap)
+
+
+	print("------ heap ------")
+	print("Heap Size: "+str(heap.size()))
+	heap.pretty_print()
+	# should print in increasing order
+	while(not heap.empty()):
+		print(heap.pop())
+
+	print("------ minheap ------")
+	print("MinHeap Size: "+str(minheap.size()))
+	minheap.pretty_print()
+	# should print in increasing order
+	while(not minheap.empty()):
+		print(minheap.pop())
+
+	print("------ maxheap ------")
+	print("MaxHeap Size: "+str(maxheap.size()))
+	maxheap.pretty_print()
+	# should print in decreasing order
+	while(not maxheap.empty()):
+		print(maxheap.pop())
+
 def main():
-	basic_test()
-	weighted_test()
+	graph_test_1()
+	graph_test_2()
+	heap_test()
+
 
 main()
