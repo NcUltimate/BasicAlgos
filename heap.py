@@ -88,6 +88,7 @@ class Heap:
 	def insert_all(self, values):
 		for value in values:
 			self.insert(value)
+
 	def insert(self, value):
 		if(self.root == None):
 			self.root = Node(value)
@@ -140,6 +141,9 @@ class Heap:
 ############################
 class PriorityQueue(Heap):
 
+	def __init__(self, increasing=True):
+		Heap.__init__(increasing)
+		
 	def enqueue(self, value):
 		self.insert(value)
 
@@ -157,8 +161,8 @@ class MinHeap(Heap):
 
 
 ############################
-# DATA STRUCTURE: MinHeap
-# ~ A wrapper for a heap. Initializes a minimum heap.
+# DATA STRUCTURE: MaxHeap
+# ~ A wrapper for a heap. Initializes a maximum heap.
 ############################
 class MaxHeap(Heap):
 
