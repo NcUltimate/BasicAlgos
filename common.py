@@ -57,8 +57,9 @@ class Edge:
 		ret += "(" if self.weighted() or self.capacious() else ""
 		ret += str(self.wt) if self.weighted() else ""
 		ret += ("/" + str(self.cap)) if self.capacious() else ""
-		ret += (")" if self.weighted or self.capacious() else "")
-		ret += "-"+str(self.v2)
+		ret += ")" if (self.weighted() or self.capacious()) else ""
+		ret += "-"+(">" if self.dir else "")
+		ret += str(self.v2)
 		return ret
 
 	def __repr__(self):

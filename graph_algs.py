@@ -138,33 +138,80 @@ class BFS:
 # ~ Limited Search. This functionality is available here.
 ############################
 class DFS:
-	def __init__(self, graph, max_depth = -1):
+	def __init__(self, graph, key, value, max_depth = -1):
 		self.key = key
 		self.value = value
 		self.max_d = max_depth
 		self.visited = set()
-		self.result = self.algorithm(graph, max_depth)
+		self.result = self.algorithm(graph)
 
 	def algorithm(self, g):
 		for vtx in g.V():
 			if(vtx in self.visited): continue
 			self.visited.add(vtx)
-			res = self.dfs_subroutine(g, vtx, 0)
+			res = self.__dfs_subroutine__(g, vtx, 0)
 			if(res != None): return res
 		return None
 
-	def dfs_subroutine(self, g, v, depth):
+	def __dfs_subroutine__(self, g, v, depth):
 		if(depth > self.max_d and self.max_d != -1): return None
 
 		for neigh in g.neighbors(v):
 			if(neigh in self.visited): continue
 			self.visited.add(neigh)
-			self.dfs_subroutine(g, neigh, depth+1)
+			self.__dfs_subroutine__(g, neigh, depth+1)
 
 		if(g.data[v][self.key] == self.value): 
 			return v
 		else:
 			return None
+
+############################
+# ALGORITHM: Depth-First Traversal (DFT)
+# ~ Takes a Graph and a start vertex as input. A depth
+# ~ First Traversal is performed starting at the start 
+# ~ vertex. If one is not specified, the entire graph is
+# ~ traversed.
+#
+# IMPLEMENTATION:
+# ~ A DFT recursively visits the children of each node
+# ~ before visiting the node itself. In large unbounded 
+# ~ graphs, it would be wise to limit the DFT with a 
+# ~ maximum depth to make it a Limited Depth First Traversal.
+# ~ This functionality is available here.
+############################
+class DFT:
+	def __init__(self, graph, start=None, max_depth=-1):
+		self.max_d = max_depth
+		self.visited = set()
+		self.post = []
+		self.tree = Graph(graph.attrs)
+		self.algorithm(graph, start)
+
+	def algorithm(self, g, s):
+		if(s == None):
+			for v in g.V():
+				if(v in self.visited): continue
+				self.visited.add(v)
+				self.__dfs_subroutine__(g, v, 0)
+		else:
+			self.visited.add(s)
+			self.__dfs_subroutine__(g, s, 0)
+
+	def __dfs_subroutine__(self, g, v, depth):
+		if(depth > self.max_d and self.max_d != -1): return
+		self.tree.add_vertex(v)
+
+		for neigh in g.neighbors(v):
+			self.tree.add_edge(g.adj[v][neigh])
+			if(neigh in self.visited): continue
+			self.visited.add(neigh)
+			self.__dfs_subroutine__(g, neigh, depth+1)
+
+		self.post.append(v)
+
+	def postorder(self):
+		return self.post
 
 ############################
 # ALGORITHM: Spanning Tree
@@ -326,3 +373,53 @@ class PrimMST:
 		return self.min_weight
 
 
+############################
+# ALGORITHM: Kosaraju's Strongly Connected Component Detection
+# ~ Takes a Graph as input, and returns a list of SCC's of the graph 
+# ~ (as directed Graphs). A SCC is a set of vertices such that
+# ~ any vertex v in the set can be reached by any other vertex c
+# ~ via a directed path from v to c.
+# 
+# IMPLEMENTATION:
+# ~ Build a Breadth first search tree (BFST) from the original
+# ~ graph. Then, reverse the graph and start the search in the
+# ~ same order. Any nodes that are reached in both searches from
+# ~ the same starting point are part of the same strongly 
+# ~ connected component.
+############################
+class KosarajuSCC:
+
+	def __init__(self, graph):
+		self.sccs = []
+		self.scc_map = {}
+		if(graph.is_directed()):
+			self.algorithm(graph)
+
+	def algorithm(self, g):
+		dft = DFT(g)
+		gr = g.reverse()
+
+		for v in reversed(dft.postorder()):
+			if(v in self.scc_map): continue
+			dftR = DFT(gr, v)
+			post = dftR.postorder()
+			rev = dftR.tree.reverse()
+			for v in post:
+				self.scc_map[v] = rev
+				gr.remove_vertex(v)
+
+			self.sccs.append(rev)
+
+	def components(self):
+		return self.sccs
+
+	def strongly_connected(self):
+		return len(self.sccs) == 1
+
+	def num_components(self):
+		return len(self.sccs)
+
+	def strong_component_of(self, vertex):
+		return self.scc_map[vertex]
+
+		

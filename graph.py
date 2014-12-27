@@ -27,6 +27,8 @@ class Graph:
 	def init_from_graph(self, g2):
 		self.data = dict(g2.data)
 		self.attrs = dict(self.attrs.items() + g2.attrs.items())
+		for v in g2.V():
+			self.add_vertex(v)
 		for e in g2.E:
 			self.add_edge(e)
 
@@ -96,7 +98,8 @@ class Graph:
 				del self.adj[n][vtx]
 
 		if(vtx in self.adj):
-			for n in self.adj[vtx]:
+			keys = self.adj[vtx].keys()
+			for n in keys:
 				self.E.remove(self.adj[vtx][n])
 				del self.adj[vtx][n]
 			del self.adj[vtx]
@@ -106,11 +109,15 @@ class Graph:
 		return (v2 in self.adj[v1]) \
 				or(v1 in self.adj[v2])
 
-	def neighbors(self, v): return self.adj[v].keys()
+	def neighbors(self, v): 
+		return self.adj[v].keys()
+
 	def edges(self, v):
 		return [self.adj[v][v2] for v2 in self.adj[v]]
 
-	def edges_from(self, v): return self.edges(v)
+	def edges_from(self, v): 
+		return self.edges(v)
+
 	def edges_into(self, v):
 		if(not self.attrs['directed']): 
 			return self.edges(v)
@@ -118,23 +125,52 @@ class Graph:
 		edges = [self.adj[vtx][v] for vtx in self.V() if v in self.adj[vtx]]
 		return edges
 
-	def degree(self, v): return len(self.neighbors(v))
-	def out_degree(self, v): return self.degree(v)
-	def in_degree(self, v): return len(self.edges_into(v))
-	def random_vertex(self): return random.choice(self.V())
-	def random_edge(self): return random.choice(self.E())
+	def degree(self, v): 
+		return len(self.neighbors(v))
+
+	def out_degree(self, v): 
+		return self.degree(v)
+
+	def in_degree(self, v): 
+		return len(self.edges_into(v))
+
+	def random_vertex(self): 
+		return random.choice(self.V())
+
+	def random_edge(self): 
+		return random.choice(self.E())
 
 	def cut(self, vertices):
 		for v in vertices:
 			self.remove_vertex(v)
 
+	def compliment(self):
+		g = Graph()
+		for v1 in self.V():
+			for v2 in self.V():
+				if(v1 == v2): continue
+				g.add_vertices([v1, v2])
+				if(v1 not in self.adj or \
+					v2 not in self.adj[v1]):
+					g.connect(v1, v2)
+		return g
+
+	def reverse(self):
+		g = Graph({'directed' : True})
+		for v1 in self.V():
+			g.add_vertex(v1)
+			for v2 in self.adj[v1]:
+				g.connect(v2, v1)
+		return g
+
 	def subgraph(self, vertices):
-		g2 = Graph()
-		for v in vertices:
-			if(v not in self.adj): continue
-			for v2 in self.adj[v]:
-				g2.add_edge(self.adj[v][v2])
-		return g2
+		g = Graph()
+		for v1 in vertices:
+			if(v1 not in self.adj): continue
+			g.add_vertex(v1)
+			for v2 in self.adj[v1]:
+				g.add_edge(self.adj[v1][v2])
+		return g
 
 	def equals(self, g2):
 		if(isinstance(g2, self.__class__)):
@@ -155,15 +191,37 @@ class Graph:
 	def __eq__(self, other):
 		return self.equals(other)
 
+	def __str__(self):
+		return str(self.E) if self.E else str(self.V())
+
+	def __repr__(self):
+		return self.__str__()
+
 	# attribute modifiers
-	def set_directed(self, directed): self.attrs['directed'] = directed
-	def set_capacious(self, capacious): self.attrs['capacious'] = capacious
-	def set_weighted(self, weighted): self.attrs['weighted'] = weighted
+	def set_directed(self, directed): 
+		self.attrs['directed'] = directed
+
+	def set_flowgraph(self, capacious): 
+		self.attrs['capacious'] = capacious
+
+	def set_weighted(self, weighted): 
+		self.attrs['weighted'] = weighted
 
 	# accessor methods
-	def V(self): return self.adj.keys()
-	def num_vertices(self): return len(self.V())
-	def num_edges(self): return len(self.E())
-	def is_directed(self): return self.attrs['directed']
-	def is_capacious(self): return self.attrs['capacious']
-	def is_weighted(self): return self.attrs['weighted']
+	def V(self): 
+		return self.adj.keys()
+
+	def num_vertices(self): 
+		return len(self.V())
+
+	def num_edges(self): 
+		return len(self.E)
+
+	def is_directed(self): 
+		return self.attrs['directed']
+
+	def is_flowgraph(self): 
+		return self.attrs['capacious']
+
+	def is_weighted(self): 
+		return self.attrs['weighted']

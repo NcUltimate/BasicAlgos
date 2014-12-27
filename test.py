@@ -87,10 +87,26 @@ def heap_test():
 	while(not maxheap.empty()):
 		print(maxheap.pop())
 
+def graph_test_3():
+	graph1 = g.Graph({'directed' : True})
+	graph1.connect(1,2)
+	graph1.connect(2,3)
+	graph1.connect(3,1)
+	graph1.connect(2,4)
+	graph1.connect(4,5)
+	graph1.connect(5,4)
+	graph1.connect(3,6)
+	graph1.connect(6,7)
+	graph1.connect(5,7)
+
+	kscc = ga.KosarajuSCC(graph1)
+	print(kscc.components())
+
 def main():
-	heap_test()
-	graph_test_1()
-	graph_test_2()
+	#heap_test()
+	#graph_test_1()
+	#graph_test_2()
+	graph_test_3()
 
 
 main()
