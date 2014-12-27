@@ -372,7 +372,6 @@ class PrimMST:
 	def weight(self):
 		return self.min_weight
 
-
 ############################
 # ALGORITHM: Kosaraju's Strongly Connected Component Detection
 # ~ Takes a Graph as input, and returns a list of SCC's of the graph 
@@ -423,3 +422,88 @@ class KosarajuSCC:
 		return self.scc_map[vertex]
 
 		
+
+############################
+# ALGORITHM: Tarjan's Bridge Detection
+# ~ Takes a Graph as input, and returns a list of Bridges of the graph 
+# ~ (as Edges). A bridge is an edge such that its removal from the
+# ~ graph would increment the number of components. This version is
+# ~ based off of the implementation by Robert Sedgewick and Kevin Wayne.
+# 
+# IMPLEMENTATION:
+# ~ The algorithm is based on the following principle: an edge is only
+# ~ a bridge iff it is not part of any cycle. Therefore, performing simple
+# ~ cycle detection (using a slightly different method than above) will
+# ~ reveal all non-cycle edges. Cycle detection in this case is done with
+# ~ a preorder traversal, and an auxiliary array named 'low'. Low[v] stores
+# ~ the lowest preorder number on any path reachable through v. Therefore,
+# ~ if low[v] is ever equal to pre[v], its preorder number, then the edge
+# ~ (u,v) with pre[u] = pre[v] - 1 is a bridge.
+############################
+class Bridges:
+
+	def __init__ (self, graph):
+		self.edges = []
+		self.pre = {}
+		self.low = {}
+		self.count = 1
+		par = child = graph.random_vertex()
+		self.algorithm(graph, par, child)
+
+	def algorithm (self, g, par, child):
+		self.pre[child] = self.count
+		self.low[child] = self.pre[child]
+		self.count+= 1
+
+		for neigh in g.neighbors(child):
+
+			if (neigh not in self.pre):
+				self.algorithm(g, child, neigh)
+				self.low[child] = min([self.low[child], self.low[neigh]])
+				if (self.low[neigh] == self.pre[neigh]):
+					self.edges.append(g.adj[child][neigh])
+
+			elif (neigh != par): # takes care of parallel edges
+				self.low[child] = min([self.low[child], self.pre[neigh]])
+
+	def bridges(self):
+		return self.edges
+
+	def num_bridges(self):
+		return len(self.edges)
+
+############################
+# ALGORITHM: Articulation Point Detection
+# ~ This algorithm follows from bridge detection: the endpoints of
+# ~ any bridge are articulation points as long as their degree is
+# ~ greater than 1. Therefore, the problem of
+# ~ finding all articulation points in a graph is reduced to finding 
+# ~ all bridges in a graph.
+# 
+# IMPLEMENTATION:
+# ~ Find all bridges using Tarjan's algorithm. Their endpoints
+# ~ comprise the set of articulation points.
+############################
+class ArticulationPoints:
+
+	def __init__(self, graph):
+		self.points = set()
+		self.algorithm(graph)
+
+	def algorithm(self, g):
+		b = Bridges(g)
+		if(b.num_bridges() == 0):
+			return
+
+		for e in b.bridges():
+			for v in e.endpoints():
+				if(v in self.points): continue
+				if(g.degree(v) <= 1): continue
+
+				self.points.add(v)
+
+	def articulation_points(self):
+		return self.points
+
+	def num_articulation_points(self):
+		return len(self.points)

@@ -87,6 +87,7 @@ def heap_test():
 	while(not maxheap.empty()):
 		print(maxheap.pop())
 
+ #strongly connected components
 def graph_test_3():
 	graph1 = g.Graph({'directed' : True})
 	graph1.connect(1,2)
@@ -102,11 +103,18 @@ def graph_test_3():
 	kscc = ga.KosarajuSCC(graph1)
 	print(kscc.components())
 
+	b = ga.Bridges(graph1)
+	print(b.bridges())
+
+	a = ga.ArticulationPoints(graph1)
+	print(a.articulation_points())
+
+
 def main():
 	#heap_test()
-	#graph_test_1()
-	#graph_test_2()
-	graph_test_3()
+	#graph_test_1() # cycle detection, components, bipartite
+	#graph_test_2() # minimum spanning trees
+	graph_test_3() # strongly connected components, bridges, A.P.s
 
 
 main()
