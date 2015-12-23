@@ -69,24 +69,7 @@ class Algorithms
         m1 = merge_sort(ary[0...ary.size/2], d + 1)
         m2 = merge_sort(ary[ary.size/2..-1], d + 1)
 
-        ary2, k, j = [], 0, 0
-        while !(j==m1.size || k==m2.size)
-          if m1[j] < m2[k]
-            ary2 << m1[j]
-            j += 1
-          elsif m1[j] > m2[k]
-            ary2 << m2[k]
-            k += 1
-          elsif m1[j] == m2[k]
-            ary2 << m1[j] << m2[k]
-            j += 1
-            k += 1
-          end
-        end
-        
-        ary2 += m2[k..-1] if j == m1.size
-        ary2 += m1[j..-1] if k == m2.size
-        ary2
+        merge(m1, m2)
       end
 
       ############################
@@ -94,9 +77,9 @@ class Algorithms
       # A fast, in-place O(nlogn) sort.
       # Redundant shuffle kills possibility of O(n^2).
       def quick_sort(ary, s=0, e=ary.size-1, d=0)
-        return ary    if d==0 and sorted?(ary)
+        return ary    if d == 0 and sorted?(ary)
 
-        ary.shuffle!  if d==0
+        ary.shuffle!  if d == 0
         return ary[s] if e == s
 
         piv = s
@@ -115,9 +98,18 @@ class Algorithms
 
       ############################
       # BUCKET SORT
-      # An O(n) sort, yay.
-      def bucket_sort(ary)
-        # TODO: finish bucket sort
+      # An O(nlog(n/k)) sort, yay.
+      def bucket_sort(ary, sort_algo = :merge_sort, num_buckets = 20)
+        bucket_size = [ary.size / num_buckets, 5].min
+
+        # I use merge_sort by default for sorting the buckets.
+        buckets = ary.each_slice(bucket_size).map { |bucket| send(sort_algo, bucket) }
+        
+        # TODO: We need a Priority Queue for the k-way merge step.
+        # I'm brute forcing it with a system sort & flatten for now.
+        indices = (0..buckets.size-1).to_a
+        indices.sort { |a,b| buckets[a][0] <=> buckets[b][0]}
+        indices.map  { |idx| buckets[idx] }.flatten
       end
 
       ############################
@@ -129,6 +121,19 @@ class Algorithms
 
       def swap(ary, a, b)
         ary[a], ary[b] = ary[b], ary[a]
+      end
+
+      def merge(m1, m2)
+        merged = []
+
+        until m1.empty? || m2.empty?
+          merged << m1.shift if m1[0] <= m2[0]
+          merged << m2.shift if m2[0] > m1[0]
+        end
+
+        merged += m1 if m2.empty?
+        merged += m2 if m1.empty?
+        merged
       end
 
       def sorted?(ary)
@@ -160,12 +165,14 @@ def main
   puts "Benchmarking..."
   puts
   require 'benchmark'
-  array = (1..10_000).to_a.shuffle
+  array = (1..1_000_000).to_a
   algos = %i[bubble_sort insertion_sort selection_sort merge_sort
             quick_sort ruby_sort]
   Benchmark.bm do |x|
     algos.each do |algo|
-      x.report("#{algo}".ljust(20)){ Algorithms::Sorting.send(algo, array.dup) }
+      x.report("#{algo}".ljust(20)) do
+        Algorithms::Sorting.bucket_sort(array.dup, algo, 2000)
+      end
     end
   end
 end
