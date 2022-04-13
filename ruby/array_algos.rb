@@ -1,5 +1,5 @@
 module Algorithms
-  module ArrayAlgorithms
+  class Array
     
   end
 end
